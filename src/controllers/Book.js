@@ -31,8 +31,8 @@ class BookController {
 
   static async createOne(req, res) {
     let book = JSON.parse(req.body.book)
-    delete book._id
-    delete book._userId
+
+    book.userId = req.auth.userId
     book.imageUrl = `${req.protocol}://${req.get('host')}/uploads/${
       req.file.filename
     }`
@@ -50,7 +50,23 @@ class BookController {
   }
 
   static async updateById(req, res) {
-    res.json('succès!')
+    let book = req.body.book ? JSON.parse(req.body.book) : req.body
+
+    if (req?.file?.filename) {
+      book.imageUrl = `${req.protocol}://${req.get('host')}/uploads/${
+        req.file.filename
+      }`
+    }
+
+    try {
+      await BookModel.updateOne({ _id: req.params.id }, book)
+    } catch (error) {
+      console.error(error)
+      res.status(422).json({ message: 'validation failed' })
+      return
+    }
+
+    res.json({ message: 'updated' })
   }
 
   static async deleteById(req, res) {
