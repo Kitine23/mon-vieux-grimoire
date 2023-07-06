@@ -1,4 +1,5 @@
 import { BookModel } from '../models/Book.js'
+import fs from 'node:fs'
 
 class BookController {
   static async getAll(req, res) {
@@ -70,11 +71,28 @@ class BookController {
   }
 
   static async deleteById(req, res) {
+    const book = await BookModel.findOne({ _id: req.params.id })
+    if (!book) {
+      res.status(404).json({ message: 'not found' })
+      return
+    }
+
+    if (book.userId !== req.auth.userId) {
+      res.status(401).json({ message: 'not authorized' })
+      return
+    }
+
     try {
       await BookModel.deleteOne({ _id: req.params.id })
+      // suppression de l'image du livre
+      const filename = book.imageUrl.split('/uploads/')?.[1]
+      fs.unlink(`uploads/${filename}`, (err) => {
+        if (err) throw err
+        console.log(`uploads/${filename} was deleted`)
+      })
     } catch (error) {
       console.error(error)
-      res.status(404).json({ message: 'not found' })
+      res.status(500).json({ message: 'server error' })
       return
     }
     res.json({ message: 'deleted' })
