@@ -8,6 +8,7 @@ const auth = (req, res, next) => {
     req.auth = {
       userId: userId,
     }
+    next()
   } catch (error) {
     console.error(error)
     res.status(401).json({ message: 'not authorized' })

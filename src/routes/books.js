@@ -4,9 +4,9 @@ import BookController from '../controllers/Book.js'
 import auth from '../routes/auth.js'
 
 const bookRouter = express.Router()
-bookRouter.get('/', auth, BookController.getAll)
-bookRouter.get('/bestrating', auth, BookController.getBestRated)
-bookRouter.get('/:id', auth, BookController.getById)
+bookRouter.get('/', BookController.getAll)
+bookRouter.get('/bestrating', BookController.getBestRated)
+bookRouter.get('/:id', BookController.getById)
 bookRouter.post('/', uploads, auth, BookController.createOne)
 bookRouter.put('/:id', auth, BookController.updateById)
 bookRouter.delete('/:id', auth, BookController.deleteById)
