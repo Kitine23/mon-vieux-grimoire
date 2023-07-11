@@ -18,6 +18,7 @@ app.use(
   })
 )
 app.use(cors())
+app.use(express.static('./public'))
 
 // routes
 app.use('/api/auth', authRouter)

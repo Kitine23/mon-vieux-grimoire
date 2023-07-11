@@ -1,10 +1,16 @@
 import { BookModel } from '../models/Book.js'
-import fs from 'node:fs'
+import { deleteUpload } from '../utils/files.js'
+import { getHost } from '../utils/urls.js'
 
 class BookController {
   static async getAll(req, res) {
-    const books = await BookModel.find()
-    res.json(books)
+    const books = await BookModel.find().lean().exec()
+    res.json(
+      books.map((book) => ({
+        ...book,
+        imageUrl: getHost(req) + book.imageUrl,
+      }))
+    )
   }
 
   static async getBestRated(req, res) {
@@ -17,29 +23,28 @@ class BookController {
   }
 
   static async getById(req, res) {
-    let book = null
     try {
-      book = await BookModel.findById(req.params.id).exec()
-      console.log(book)
+      const book = await BookModel.findById(req.params.id).lean().exec()
+      res.json({
+        ...book,
+        imageUrl: getHost(req) + book.imageUrl,
+      })
     } catch (error) {
       console.error(error)
       res.status(404).json('not found')
-      return
     }
-
-    res.json(book)
   }
 
   static async createOne(req, res) {
     let book = JSON.parse(req.body.book)
-
-    book.userId = req.auth.userId
-    book.imageUrl = `${req.protocol}://${req.get('host')}/uploads/${
-      req.file.filename
-    }`
+    const imageUrl = req.image.filename
 
     try {
-      const BookObject = new BookModel(book)
+      const BookObject = new BookModel({
+        ...book,
+        userId: req.auth.userId,
+        imageUrl,
+      })
       await BookObject.save()
     } catch (error) {
       console.error(error)
@@ -53,10 +58,12 @@ class BookController {
   static async updateById(req, res) {
     let book = req.body.book ? JSON.parse(req.body.book) : req.body
 
-    if (req?.file?.filename) {
-      book.imageUrl = `${req.protocol}://${req.get('host')}/uploads/${
-        req.file.filename
-      }`
+    if (req?.image?.filename) {
+      // new image ? we delete previous one
+      const { imageUrl } = await BookModel.findById(req.params.id).lean().exec()
+      deleteUpload(imageUrl)
+      // add new filename
+      book.imageUrl = req.image.filename
     }
 
     try {
@@ -84,12 +91,7 @@ class BookController {
 
     try {
       await BookModel.deleteOne({ _id: req.params.id })
-      // suppression de l'image du livre
-      const filename = book.imageUrl.split('/uploads/')?.[1]
-      fs.unlink(`uploads/${filename}`, (err) => {
-        if (err) throw err
-        console.log(`uploads/${filename} was deleted`)
-      })
+      deleteUpload(book.imageUrl)
     } catch (error) {
       console.error(error)
       res.status(500).json({ message: 'server error' })
