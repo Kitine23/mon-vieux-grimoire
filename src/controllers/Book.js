@@ -74,7 +74,7 @@ class BookController {
       return
     }
 
-    res.json({ message: 'updated' })
+    res.status(204).json({ message: 'updated' })
   }
 
   static async deleteById(req, res) {
@@ -97,7 +97,7 @@ class BookController {
       res.status(500).json({ message: 'server error' })
       return
     }
-    res.json({ message: 'deleted' })
+    res.status(204).json({ message: 'deleted' })
   }
 
   static async addRatingById(req, res) {
@@ -110,7 +110,7 @@ class BookController {
       console.error(error)
       res.status(422).json({ message: 'validation error' })
     }
-    res.json(book)
+    res.status(204).json(book)
   }
 }
 
