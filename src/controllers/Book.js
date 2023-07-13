@@ -1,4 +1,5 @@
 import { BookModel } from '../models/Book.js'
+import { average } from '../utils/arrays.js'
 import { deleteUpload } from '../utils/files.js'
 import { getHost } from '../utils/urls.js'
 
@@ -56,6 +57,12 @@ class BookController {
   }
 
   static async updateById(req, res) {
+    const { userId } = BookModel.findById(req.params.id)
+    if (req.auth?.userId !== userId) {
+      res.status(403).json('403: unauthorized request')
+      return
+    }
+
     let book = req.body.book ? JSON.parse(req.body.book) : req.body
 
     if (req?.image?.filename) {
@@ -78,14 +85,14 @@ class BookController {
   }
 
   static async deleteById(req, res) {
-    const book = await BookModel.findOne({ _id: req.params.id })
+    const book = await BookModel.findById(req.params.id)
     if (!book) {
       res.status(404).json({ message: 'not found' })
       return
     }
 
     if (book.userId !== req.auth.userId) {
-      res.status(401).json({ message: 'not authorized' })
+      res.status(403).json('403: unauthorized request')
       return
     }
 
@@ -102,15 +109,28 @@ class BookController {
 
   static async addRatingById(req, res) {
     try {
+      const { userId, rating } = req.body
+      if (rating < 0 || rating > 5)
+        throw new Error('rating must be between 0 and 5')
+
       const book = await BookModel.findById(req.params.id)
-      book.ratings.push(req.body)
+      if (book.ratings.find((r) => r.userId === userId)) {
+        throw new Error('cannot rate a book twice')
+      }
+
+      book.ratings.push({
+        userId,
+        grade: rating,
+      })
+      book.averageRating = average(book.ratings.map((rating) => rating.grade))
+
       const BookObject = new BookModel(book)
       await BookObject.save()
+      res.status(204).json(book)
     } catch (error) {
       console.error(error)
       res.status(422).json({ message: 'validation error' })
     }
-    res.status(204).json(book)
   }
 }
 
