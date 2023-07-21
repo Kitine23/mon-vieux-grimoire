@@ -1,7 +1,7 @@
 import express from "express"
 import BookController from "../controllers/Book.js"
-import auth from "../middlewares/auth.js"
-import { uploads, imageOptimization } from "../middlewares/uploads.js"
+import auth from "../middlewares/authMiddleware.js"
+import { uploads, imageOptimization } from "../middlewares/uploadsMiddleware.js"
 
 const bookRouter = express.Router()
 bookRouter.get("/", BookController.getAll)
