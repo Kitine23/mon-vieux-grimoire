@@ -2,7 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js"
-import { connectDB } from "./db.js"
+import connectDB from "./config/db.js"
 import bookRouter from "./routes/booksRoutes.js"
 import authRouter from "./routes/authRoutes.js"
 
