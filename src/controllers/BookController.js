@@ -16,13 +16,19 @@ class BookController {
     )
   })
 
-  static getBestRated = asyncHandler(async (_req, res) => {
+  static getBestRated = asyncHandler(async (req, res) => {
     const threeBestAverageNoteBooks = await BookModel.find()
       .sort({ averageRating: -1 })
       .limit(3)
+      .lean()
       .exec()
 
-    res.json(threeBestAverageNoteBooks)
+    res.json(
+      threeBestAverageNoteBooks.map((book) => ({
+        ...book,
+        imageUrl: getHost(req) + book.imageUrl,
+      }))
+    )
   })
 
   static getById = asyncHandler(async (req, res) => {
@@ -52,7 +58,10 @@ class BookController {
   })
 
   static updateById = asyncHandler(async (req, res) => {
-    const { userId } = BookModel.findById(req.params.id)
+    const { userId } = await BookModel.findById(req.params.id).lean().exec()
+    if (!userId)
+      throw new NotFoundError(`Book n°${req.params.id} does not exist`)
+
     if (req.auth?.userId !== userId) {
       res.status(403).json("403: unauthorized request")
       return
@@ -70,7 +79,7 @@ class BookController {
 
     await BookModel.updateOne({ _id: req.params.id }, book)
 
-    res.status(204).json({ message: "updated" })
+    res.json({ message: "updated" })
   })
 
   static deleteById = asyncHandler(async (req, res) => {
@@ -88,7 +97,7 @@ class BookController {
     await BookModel.deleteOne({ _id: req.params.id })
     deleteUpload(book.imageUrl)
 
-    res.status(204).json({ message: "deleted" })
+    res.json({ message: "deleted" })
   })
 
   static addRatingById = asyncHandler(async (req, res) => {
@@ -109,7 +118,9 @@ class BookController {
 
     const BookObject = new BookModel(book)
     await BookObject.save()
-    res.status(204).json(book)
+
+    book.imageUrl = getHost(req) + book.imageUrl
+    res.json(book)
   })
 }
 
