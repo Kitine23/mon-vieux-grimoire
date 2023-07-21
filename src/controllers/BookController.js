@@ -1,4 +1,4 @@
-import { BookModel } from "../models/Book.js"
+import { BookModel } from "../models/BookModel.js"
 import { average } from "../utils/arrays.js"
 import { deleteUpload } from "../utils/files.js"
 import { getHost } from "../utils/urls.js"

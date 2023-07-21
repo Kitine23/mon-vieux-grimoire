@@ -1,5 +1,5 @@
 import express from "express"
-import UserController from "../controllers/User.js"
+import UserController from "../controllers/UserController.js"
 
 const authRouter = express.Router()
 authRouter.post("/signup", UserController.signup)

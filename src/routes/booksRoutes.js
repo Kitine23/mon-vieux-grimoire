@@ -1,5 +1,5 @@
 import express from "express"
-import BookController from "../controllers/Book.js"
+import BookController from "../controllers/BookController.js"
 import auth from "../middlewares/authMiddleware.js"
 import { uploads, imageOptimization } from "../middlewares/uploadsMiddleware.js"
 
