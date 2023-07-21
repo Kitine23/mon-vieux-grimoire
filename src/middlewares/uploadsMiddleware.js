@@ -1,15 +1,15 @@
-import multer from 'multer'
-import crypto from 'node:crypto'
-import sharp from 'sharp'
+import multer from "multer"
+import crypto from "node:crypto"
+import sharp from "sharp"
 
 const MIME_TYPES = {
-  'image/jpg': 'jpg',
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
+  "image/jpg": "jpg",
+  "image/jpeg": "jpg",
+  "image/png": "png",
 }
 
 const storage = multer.memoryStorage()
-export const uploads = multer({ storage }).single('image')
+export const uploads = multer({ storage }).single("image")
 export const imageOptimization = async (req, res, next) => {
   // no uploads
   if (!req.file) {
@@ -38,7 +38,7 @@ export const imageOptimization = async (req, res, next) => {
     next()
   } catch (error) {
     console.error(error)
-    res.status(500).json({ message: 'error saving image' })
+    res.status(500).json({ message: "error saving image" })
     return
   }
 }

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose"
 
 export const connectDB = () =>
   mongoose
@@ -6,5 +6,5 @@ export const connectDB = () =>
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
-    .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch(() => console.log('Connexion à MongoDB échouée !'))
+    .then(() => console.log("Connexion à MongoDB réussie !"))
+    .catch(() => console.log("Connexion à MongoDB échouée !"))

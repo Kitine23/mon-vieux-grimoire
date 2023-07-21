@@ -1,7 +1,7 @@
-import { BookModel } from '../models/Book.js'
-import { average } from '../utils/arrays.js'
-import { deleteUpload } from '../utils/files.js'
-import { getHost } from '../utils/urls.js'
+import { BookModel } from "../models/Book.js"
+import { average } from "../utils/arrays.js"
+import { deleteUpload } from "../utils/files.js"
+import { getHost } from "../utils/urls.js"
 
 class BookController {
   static async getAll(req, res) {
@@ -32,7 +32,7 @@ class BookController {
       })
     } catch (error) {
       console.error(error)
-      res.status(404).json('not found')
+      res.status(404).json("not found")
     }
   }
 
@@ -49,17 +49,17 @@ class BookController {
       await BookObject.save()
     } catch (error) {
       console.error(error)
-      res.status(422).json({ message: 'validation failed' })
+      res.status(422).json({ message: "validation failed" })
       return
     }
 
-    res.status(201).json({ message: 'created' })
+    res.status(201).json({ message: "created" })
   }
 
   static async updateById(req, res) {
     const { userId } = BookModel.findById(req.params.id)
     if (req.auth?.userId !== userId) {
-      res.status(403).json('403: unauthorized request')
+      res.status(403).json("403: unauthorized request")
       return
     }
 
@@ -77,22 +77,22 @@ class BookController {
       await BookModel.updateOne({ _id: req.params.id }, book)
     } catch (error) {
       console.error(error)
-      res.status(422).json({ message: 'validation failed' })
+      res.status(422).json({ message: "validation failed" })
       return
     }
 
-    res.status(204).json({ message: 'updated' })
+    res.status(204).json({ message: "updated" })
   }
 
   static async deleteById(req, res) {
     const book = await BookModel.findById(req.params.id)
     if (!book) {
-      res.status(404).json({ message: 'not found' })
+      res.status(404).json({ message: "not found" })
       return
     }
 
     if (book.userId !== req.auth.userId) {
-      res.status(403).json('403: unauthorized request')
+      res.status(403).json("403: unauthorized request")
       return
     }
 
@@ -101,21 +101,21 @@ class BookController {
       deleteUpload(book.imageUrl)
     } catch (error) {
       console.error(error)
-      res.status(500).json({ message: 'server error' })
+      res.status(500).json({ message: "server error" })
       return
     }
-    res.status(204).json({ message: 'deleted' })
+    res.status(204).json({ message: "deleted" })
   }
 
   static async addRatingById(req, res) {
     try {
       const { userId, rating } = req.body
       if (rating < 0 || rating > 5)
-        throw new Error('rating must be between 0 and 5')
+        throw new Error("rating must be between 0 and 5")
 
       const book = await BookModel.findById(req.params.id)
       if (book.ratings.find((r) => r.userId === userId)) {
-        throw new Error('cannot rate a book twice')
+        throw new Error("cannot rate a book twice")
       }
 
       book.ratings.push({
@@ -129,7 +129,7 @@ class BookController {
       res.status(204).json(book)
     } catch (error) {
       console.error(error)
-      res.status(422).json({ message: 'validation error' })
+      res.status(422).json({ message: "validation error" })
     }
   }
 }

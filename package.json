@@ -6,13 +6,16 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "format": "prettier . --write"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
-    "nodemon": "^2.0.22"
+    "eslint": "^8.45.0",
+    "nodemon": "^2.0.22",
+    "prettier": "^3.0.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",

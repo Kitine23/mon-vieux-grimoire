@@ -1,9 +1,9 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import { connectDB } from './db.js'
-import bookRouter from './routes/books.js'
-import authRouter from './routes/auth.js'
+import express from "express"
+import dotenv from "dotenv"
+import cors from "cors"
+import { connectDB } from "./db.js"
+import bookRouter from "./routes/books.js"
+import authRouter from "./routes/auth.js"
 
 dotenv.config()
 
@@ -18,10 +18,10 @@ app.use(
   })
 )
 app.use(cors())
-app.use(express.static('./public'))
+app.use(express.static("./public"))
 
 // routes
-app.use('/api/auth', authRouter)
-app.use('/api/books', bookRouter)
+app.use("/api/auth", authRouter)
+app.use("/api/books", bookRouter)
 
 export { app }

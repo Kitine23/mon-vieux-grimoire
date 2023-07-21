@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import fs from "node:fs"
 
 export const deleteUpload = (filename) => {
   fs.unlink(`./public${filename}`, (err) => {

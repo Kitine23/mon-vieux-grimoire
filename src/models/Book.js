@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose"
 
 const bookSchema = mongoose.Schema({
   userId: { type: String, required: true },
@@ -16,4 +16,4 @@ const bookSchema = mongoose.Schema({
   averageRating: { type: Number, required: true },
 })
 
-export const BookModel = mongoose.model('Book', bookSchema)
+export const BookModel = mongoose.model("Book", bookSchema)

@@ -1,6 +1,6 @@
-import { UserModel } from '../models/User.js'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import { UserModel } from "../models/User.js"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 class UserController {
   static async signup(req, res) {
@@ -9,7 +9,7 @@ class UserController {
       hash = await bcrypt.hash(req.body.password, 10)
     } catch (error) {
       console.error(error)
-      res.status(500).json({ message: 'cannot hash password' })
+      res.status(500).json({ message: "cannot hash password" })
       return
     }
 
@@ -23,11 +23,11 @@ class UserController {
       console.error(error)
       res
         .status(422)
-        .json({ message: 'validation error', reason: error?.message })
+        .json({ message: "validation error", reason: error?.message })
       return
     }
 
-    res.status(201).json({ message: 'created' })
+    res.status(201).json({ message: "created" })
   }
 
   static async login(req, res) {
@@ -50,7 +50,7 @@ class UserController {
       }
 
       const token = jwt.sign({ userId: user._id }, process.env.JWT_TOKEN, {
-        expiresIn: '24h',
+        expiresIn: "24h",
       })
 
       res.json({ userId: user._id, token })
