@@ -7,13 +7,16 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "lint": "eslint . --fix"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
     "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "nodemon": "^2.0.22",
     "prettier": "^3.0.0"
   },

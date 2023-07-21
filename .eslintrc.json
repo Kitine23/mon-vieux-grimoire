@@ -1,0 +1,11 @@
+{
+  "extends": ["eslint:recommended", "prettier"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
+  "env": {
+    "node": true,
+    "commonjs": false
+  }
+}
