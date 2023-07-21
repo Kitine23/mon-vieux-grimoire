@@ -1,6 +1,6 @@
 import { BookModel } from "../models/BookModel.js"
 import { average } from "../utils/arrays.js"
-import { NotFoundError } from "../utils/errors.js"
+import { NotFoundError, ValidationError } from "../utils/errors.js"
 import { deleteUpload } from "../utils/files.js"
 import { getHost } from "../utils/urls.js"
 import asyncHandler from "express-async-handler"
@@ -37,27 +37,21 @@ class BookController {
     })
   })
 
-  static async createOne(req, res) {
+  static createOne = asyncHandler(async (req, res) => {
     let book = JSON.parse(req.body.book)
     const imageUrl = req.image.filename
 
-    try {
-      const BookObject = new BookModel({
-        ...book,
-        userId: req.auth.userId,
-        imageUrl,
-      })
-      await BookObject.save()
-    } catch (error) {
-      console.error(error)
-      res.status(422).json({ message: "validation failed" })
-      return
-    }
+    const BookObject = new BookModel({
+      ...book,
+      userId: req.auth.userId,
+      imageUrl,
+    })
+    await BookObject.save()
 
     res.status(201).json({ message: "created" })
-  }
+  })
 
-  static async updateById(req, res) {
+  static updateById = asyncHandler(async (req, res) => {
     const { userId } = BookModel.findById(req.params.id)
     if (req.auth?.userId !== userId) {
       res.status(403).json("403: unauthorized request")
@@ -74,18 +68,12 @@ class BookController {
       book.imageUrl = req.image.filename
     }
 
-    try {
-      await BookModel.updateOne({ _id: req.params.id }, book)
-    } catch (error) {
-      console.error(error)
-      res.status(422).json({ message: "validation failed" })
-      return
-    }
+    await BookModel.updateOne({ _id: req.params.id }, book)
 
     res.status(204).json({ message: "updated" })
-  }
+  })
 
-  static async deleteById(req, res) {
+  static deleteById = asyncHandler(async (req, res) => {
     const book = await BookModel.findById(req.params.id)
     if (!book) {
       res.status(404).json({ message: "not found" })
@@ -97,42 +85,32 @@ class BookController {
       return
     }
 
-    try {
-      await BookModel.deleteOne({ _id: req.params.id })
-      deleteUpload(book.imageUrl)
-    } catch (error) {
-      console.error(error)
-      res.status(500).json({ message: "server error" })
-      return
-    }
+    await BookModel.deleteOne({ _id: req.params.id })
+    deleteUpload(book.imageUrl)
+
     res.status(204).json({ message: "deleted" })
-  }
+  })
 
-  static async addRatingById(req, res) {
-    try {
-      const { userId, rating } = req.body
-      if (rating < 0 || rating > 5)
-        throw new Error("rating must be between 0 and 5")
+  static addRatingById = asyncHandler(async (req, res) => {
+    const { userId, rating } = req.body
+    if (rating < 0 || rating > 5)
+      throw new ValidationError("rating must be between 0 and 5")
 
-      const book = await BookModel.findById(req.params.id)
-      if (book.ratings.find((r) => r.userId === userId)) {
-        throw new Error("cannot rate a book twice")
-      }
-
-      book.ratings.push({
-        userId,
-        grade: rating,
-      })
-      book.averageRating = average(book.ratings.map((rating) => rating.grade))
-
-      const BookObject = new BookModel(book)
-      await BookObject.save()
-      res.status(204).json(book)
-    } catch (error) {
-      console.error(error)
-      res.status(422).json({ message: "validation error" })
+    const book = await BookModel.findById(req.params.id)
+    if (book.ratings.find((r) => r.userId === userId)) {
+      throw new ValidationError("cannot rate a book twice")
     }
-  }
+
+    book.ratings.push({
+      userId,
+      grade: rating,
+    })
+    book.averageRating = average(book.ratings.map((rating) => rating.grade))
+
+    const BookObject = new BookModel(book)
+    await BookObject.save()
+    res.status(204).json(book)
+  })
 }
 
 export default BookController
