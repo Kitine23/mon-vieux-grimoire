@@ -1,10 +1,12 @@
 import { BookModel } from "../models/BookModel.js"
 import { average } from "../utils/arrays.js"
+import { NotFoundError } from "../utils/errors.js"
 import { deleteUpload } from "../utils/files.js"
 import { getHost } from "../utils/urls.js"
+import asyncHandler from "express-async-handler"
 
 class BookController {
-  static async getAll(req, res) {
+  static getAll = asyncHandler(async (req, res) => {
     const books = await BookModel.find().lean().exec()
     res.json(
       books.map((book) => ({
@@ -12,29 +14,28 @@ class BookController {
         imageUrl: getHost(req) + book.imageUrl,
       }))
     )
-  }
+  })
 
-  static async getBestRated(req, res) {
+  static getBestRated = asyncHandler(async (_req, res) => {
     const threeBestAverageNoteBooks = await BookModel.find()
       .sort({ averageRating: -1 })
       .limit(3)
       .exec()
 
     res.json(threeBestAverageNoteBooks)
-  }
+  })
 
-  static async getById(req, res) {
-    try {
-      const book = await BookModel.findById(req.params.id).lean().exec()
-      res.json({
-        ...book,
-        imageUrl: getHost(req) + book.imageUrl,
-      })
-    } catch (error) {
-      console.error(error)
-      res.status(404).json("not found")
+  static getById = asyncHandler(async (req, res) => {
+    const book = await BookModel.findById(req.params.id).lean().exec()
+    if (!book) {
+      throw new NotFoundError(`book n°${req.params.id} not found`)
     }
-  }
+
+    res.json({
+      ...book,
+      imageUrl: getHost(req) + book.imageUrl,
+    })
+  })
 
   static async createOne(req, res) {
     let book = JSON.parse(req.body.book)

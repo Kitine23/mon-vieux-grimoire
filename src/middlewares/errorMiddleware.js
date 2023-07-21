@@ -1,4 +1,4 @@
-import { ValidationError } from "../utils/errors.js"
+import { NotFoundError, ValidationError } from "../utils/errors.js"
 
 const notFound = (req, res, next) => {
   const error = new Error(`NotFound - ${req.originalUrl}`)
@@ -17,6 +17,10 @@ const errorHandler = (err, _req, res, _next) => {
 
   if (err instanceof ValidationError) {
     statusCode = 422
+  }
+
+  if (err instanceof NotFoundError) {
+    statusCode = 404
   }
 
   console.log(err.name)

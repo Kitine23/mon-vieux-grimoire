@@ -29,36 +29,31 @@ class UserController {
     res.status(201).json({ message: "created" })
   })
 
-  static async login(req, res) {
-    try {
-      const email = req.body?.email
-      const password = req.body?.password
+  static login = asyncHandler(async (req, res) => {
+    const { email, password } = req.body
 
-      if (!email | !password) {
-        throw `invalid email or password`
-      }
+    if (!email || !password) {
+      throw new ValidationError("Missing email for password in body")
+    }
 
-      const user = await UserModel.findOne({ email }).exec()
-      if (!user) {
-        throw `invalid email or password`
-      }
-
-      const isValid = await bcrypt.compare(password, user.password)
-      if (!isValid) {
-        throw `invalid email or password`
-      }
-
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_TOKEN, {
-        expiresIn: "24h",
-      })
-
-      res.json({ userId: user._id, token })
-    } catch (error) {
-      console.error(error)
-      res.status(401).json({ message: error })
+    const user = await UserModel.findOne({ email }).exec()
+    if (!user) {
+      res.json({ message: `invalid email or password` })
       return
     }
-  }
+
+    const isValid = await bcrypt.compare(password, user.password)
+    if (!isValid) {
+      res.json({ message: `invalid email or password` })
+      return
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_TOKEN, {
+      expiresIn: "24h",
+    })
+
+    res.json({ userId: user._id, token })
+  })
 }
 
 export default UserController
