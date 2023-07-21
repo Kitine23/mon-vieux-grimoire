@@ -1,34 +1,33 @@
 import { UserModel } from "../models/UserModel.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import asyncHandler from "express-async-handler"
+import { ValidationError } from "../utils/errors.js"
 
 class UserController {
-  static async signup(req, res) {
-    let hash
-    try {
-      hash = await bcrypt.hash(req.body.password, 10)
-    } catch (error) {
-      console.error(error)
-      res.status(500).json({ message: "cannot hash password" })
-      return
-    }
+  /**
+   * Auth signup Controller action
+   * @param {Request} req
+   * @param {Response} res
+   * @description Auth create user
+   * @route POST /api/auth/signup
+   */
+  static signup = asyncHandler(async (req, res) => {
+    const { email, password } = req.body
 
-    try {
-      const UserObject = new UserModel({
-        email: req.body.email,
-        password: hash,
-      })
-      await UserObject.save()
-    } catch (error) {
-      console.error(error)
-      res
-        .status(422)
-        .json({ message: "validation error", reason: error?.message })
-      return
-    }
+    if (!email || !password)
+      throw new ValidationError("Missing email for password in body")
+
+    const hash = await bcrypt.hash(password, 10)
+
+    const UserObject = new UserModel({
+      email,
+      password: hash,
+    })
+    await UserObject.save()
 
     res.status(201).json({ message: "created" })
-  }
+  })
 
   static async login(req, res) {
     try {
