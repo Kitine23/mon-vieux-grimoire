@@ -29,16 +29,24 @@ nvm use 18
 npm install
 ```
 
-Then start using
+Environment variables :
 
-```
-npm start
-```
+Create `.env` file in root directory to add :
+
+- `PORT`: (express port number)
+- `JWT_TOKEN`: (secret to generate JWT token)
+- `MONGODB_URI`: (connection url to mongodb DB)
 
 ## Usage <a name = "usage"></a>
 
-Run development server
+Run development server:
 
 ```
 npm run dev
+```
+
+Run production server:
+
+```
+npm start
 ```
