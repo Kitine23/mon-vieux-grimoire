@@ -12,6 +12,10 @@ class UserController {
    * @description Auth create user
    * @route POST /api/auth/signup
    */
+
+  /* La méthode "inscription statique" est une action du contrôleur qui gère la fonctionnalité
+  d'inscription pour un utilisateur. C'est une fonction asynchrone qui prend les objets `req`
+  (demande) et `res` (réponse) comme paramètres. */
   static signup = asyncHandler(async (req, res) => {
     const { email, password } = req.body
 
@@ -29,6 +33,9 @@ class UserController {
     res.status(201).json({ message: "created" })
   })
 
+  /* La méthode "connexion statique" est une action du contrôleur qui gère la fonctionnalité de
+  connexion de l'utilisateur. C'est une fonction asynchrone qui prend les objets `req` (demande) et
+  `res` (réponse) comme paramètres. */
   static login = asyncHandler(async (req, res) => {
     const { email, password } = req.body
 
